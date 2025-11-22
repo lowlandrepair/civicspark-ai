@@ -1,262 +1,201 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { Report, ReportStatus, ReportPriority } from "@/types/report";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { Report, ReportStatus } from "@/types/report";
+import { toast } from "@/hooks/use-toast";
 
 interface ReportContextType {
   reports: Report[];
-  addReport: (report: Omit<Report, "id" | "timestamp" | "upvotes">) => void;
-  updateReport: (id: string, updates: Partial<Report>) => void;
-  deleteReport: (id: string) => void;
+  addReport: (report: Omit<Report, "id" | "timestamp" | "upvotes">) => Promise<void>;
+  updateReport: (id: string, updates: Partial<Report>) => Promise<void>;
+  deleteReport: (id: string) => Promise<void>;
   getReportById: (id: string) => Report | undefined;
-  upvoteReport: (id: string) => void;
+  upvoteReport: (id: string) => Promise<void>;
   getTotalResolved: () => number;
+  isLoading: boolean;
 }
 
 const ReportContext = createContext<ReportContextType | undefined>(undefined);
 
-const STORAGE_KEY = "citycare_reports";
-
-// Mock data seeded for New York City area
-const mockReports: Report[] = [
-  {
-    id: "1",
-    title: "Large pothole on Broadway",
-    category: "Pothole",
-    description: "Deep pothole causing traffic issues near Times Square intersection. Approximately 2 feet wide and 6 inches deep.",
-    status: "In Progress",
-    priority: "High",
-    coordinates: { lat: 40.7580, lng: -73.9855 },
-    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    upvotes: 23,
-    imageUrl: "https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=400"
-  },
-  {
-    id: "2",
-    title: "Broken streetlight",
-    category: "Lighting",
-    description: "Street lighting is completely out on 5th Avenue between 42nd and 43rd. Safety concern for pedestrians at night.",
-    status: "Pending",
-    priority: "High",
-    coordinates: { lat: 40.7549, lng: -73.9840 },
-    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    upvotes: 15,
-    imageUrl: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400"
-  },
-  {
-    id: "3",
-    title: "Overflowing trash bins",
-    category: "Trash",
-    description: "Multiple trash receptacles overflowing in Central Park near Bethesda Fountain. Attracting rodents and creating unsanitary conditions.",
-    status: "Resolved",
-    priority: "Medium",
-    coordinates: { lat: 40.7739, lng: -73.9718 },
-    timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    upvotes: 8,
-    imageUrl: "https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=400"
-  },
-  {
-    id: "4",
-    title: "Graffiti on subway entrance",
-    category: "Graffiti",
-    description: "Extensive graffiti vandalism on the Union Square subway entrance. Needs immediate cleaning.",
-    status: "In Progress",
-    priority: "Medium",
-    coordinates: { lat: 40.7359, lng: -73.9911 },
-    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    upvotes: 12,
-    imageUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400"
-  },
-  {
-    id: "5",
-    title: "Water main leak",
-    category: "Water Leak",
-    description: "Significant water leak flooding the sidewalk on Madison Avenue. Water pressure appears low in surrounding buildings.",
-    status: "In Progress",
-    priority: "High",
-    coordinates: { lat: 40.7614, lng: -73.9776 },
-    timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-    upvotes: 34,
-    imageUrl: "https://images.unsplash.com/photo-1584555613497-9ecf9dd06f68?w=400"
-  },
-  {
-    id: "6",
-    title: "Damaged tree blocking sidewalk",
-    category: "Tree Maintenance",
-    description: "Large tree branch has fallen and is blocking the entire sidewalk on Park Avenue. Pedestrians forced into street.",
-    status: "Pending",
-    priority: "High",
-    coordinates: { lat: 40.7489, lng: -73.9680 },
-    timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-    upvotes: 19,
-    imageUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400"
-  },
-  {
-    id: "7",
-    title: "Potholes on Brooklyn Bridge",
-    category: "Pothole",
-    description: "Multiple potholes forming on the Brooklyn Bridge pedestrian walkway. Creating hazards for cyclists and walkers.",
-    status: "Pending",
-    priority: "Medium",
-    coordinates: { lat: 40.7061, lng: -73.9969 },
-    timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-    upvotes: 27,
-    imageUrl: "https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=400"
-  },
-  {
-    id: "8",
-    title: "Illegal dumping site",
-    category: "Trash",
-    description: "Large pile of construction debris and household waste illegally dumped in empty lot in Chinatown.",
-    status: "Resolved",
-    priority: "Medium",
-    coordinates: { lat: 40.7156, lng: -73.9970 },
-    timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    upvotes: 14,
-    imageUrl: "https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=400"
-  },
-  {
-    id: "9",
-    title: "Dark alley needs lighting",
-    category: "Lighting",
-    description: "Alley between buildings on the Lower East Side has no lighting at all. Major safety concern reported by residents.",
-    status: "Pending",
-    priority: "High",
-    coordinates: { lat: 40.7209, lng: -73.9845 },
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    upvotes: 31,
-    imageUrl: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400"
-  },
-  {
-    id: "10",
-    title: "Fire hydrant leaking",
-    category: "Water Leak",
-    description: "Fire hydrant on West Side Highway continuously leaking water. Causing ice formation in cold weather.",
-    status: "In Progress",
-    priority: "Medium",
-    coordinates: { lat: 40.7410, lng: -74.0070 },
-    timestamp: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(),
-    upvotes: 9,
-    imageUrl: "https://images.unsplash.com/photo-1584555613497-9ecf9dd06f68?w=400"
-  },
-  {
-    id: "11",
-    title: "Road crack needs repair",
-    category: "Pothole",
-    description: "Large crack developing across the entire width of street in Greenwich Village. Could become major pothole soon.",
-    status: "Pending",
-    priority: "Low",
-    coordinates: { lat: 40.7336, lng: -74.0027 },
-    timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-    upvotes: 6,
-    imageUrl: "https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=400"
-  },
-  {
-    id: "12",
-    title: "Broken traffic light",
-    category: "Lighting",
-    description: "Traffic signal stuck on red at Houston Street intersection. Causing confusion and traffic backup.",
-    status: "Resolved",
-    priority: "High",
-    coordinates: { lat: 40.7258, lng: -74.0022 },
-    timestamp: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-    upvotes: 42,
-    imageUrl: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400"
-  },
-  {
-    id: "13",
-    title: "Sidewalk tree root damage",
-    category: "Tree Maintenance",
-    description: "Tree roots have completely broken up sidewalk creating trip hazards on the Upper West Side.",
-    status: "Pending",
-    priority: "Medium",
-    coordinates: { lat: 40.7870, lng: -73.9754 },
-    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    upvotes: 11,
-    imageUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400"
-  },
-  {
-    id: "14",
-    title: "Park bench vandalism",
-    category: "Graffiti",
-    description: "Multiple park benches in Washington Square Park defaced with spray paint.",
-    status: "Resolved",
-    priority: "Low",
-    coordinates: { lat: 40.7308, lng: -73.9973 },
-    timestamp: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-    upvotes: 5,
-    imageUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400"
-  },
-  {
-    id: "15",
-    title: "Abandoned shopping carts",
-    category: "Trash",
-    description: "Several shopping carts abandoned on East River waterfront. Creating obstruction on bicycle path.",
-    status: "In Progress",
-    priority: "Low",
-    coordinates: { lat: 40.7468, lng: -73.9714 },
-    timestamp: new Date(Date.now() - 30 * 60 * 60 * 1000).toISOString(),
-    upvotes: 7,
-    imageUrl: "https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=400"
-  }
-];
-
 export const ReportProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [reports, setReports] = useState<Report[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
 
-  // Load from localStorage on mount
+  // Fetch reports from Supabase
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      setReports(JSON.parse(stored));
-    } else {
-      // Seed with mock data if empty
-      setReports(mockReports);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(mockReports));
-    }
+    fetchReports();
   }, []);
 
-  // Save to localStorage whenever reports change
-  useEffect(() => {
-    if (reports.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
+  const fetchReports = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("reports")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const formattedReports: Report[] = (data || []).map((report) => ({
+        id: report.id,
+        title: report.title,
+        category: report.category as Report["category"],
+        description: report.description,
+        status: report.status as Report["status"],
+        priority: report.priority as Report["priority"],
+        coordinates: { lat: report.lat, lng: report.lng },
+        timestamp: report.created_at,
+        upvotes: report.upvotes,
+        imageUrl: report.image_url || "",
+        userId: report.user_id,
+      }));
+
+      setReports(formattedReports);
+    } catch (error: any) {
+      console.error("Error fetching reports:", error);
+      toast({
+        title: "Error loading reports",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-  }, [reports]);
-
-  const addReport = (report: Omit<Report, "id" | "timestamp" | "upvotes">) => {
-    const newReport: Report = {
-      ...report,
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString(),
-      upvotes: 0
-    };
-    setReports(prev => [newReport, ...prev]);
   };
 
-  const updateReport = (id: string, updates: Partial<Report>) => {
-    setReports(prev => 
-      prev.map(report => 
-        report.id === id ? { ...report, ...updates } : report
-      )
-    );
+  const addReport = async (report: Omit<Report, "id" | "timestamp" | "upvotes">) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to submit a report",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from("reports")
+        .insert({
+          user_id: user.id,
+          title: report.title,
+          category: report.category,
+          description: report.description,
+          status: report.status,
+          priority: report.priority,
+          lat: report.coordinates.lat,
+          lng: report.coordinates.lng,
+          image_url: report.imageUrl,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const newReport: Report = {
+        id: data.id,
+        title: data.title,
+        category: data.category as Report["category"],
+        description: data.description,
+        status: data.status as Report["status"],
+        priority: data.priority as Report["priority"],
+        coordinates: { lat: data.lat, lng: data.lng },
+        timestamp: data.created_at,
+        upvotes: data.upvotes,
+        imageUrl: data.image_url || "",
+        userId: data.user_id,
+      };
+
+      setReports((prev) => [newReport, ...prev]);
+    } catch (error: any) {
+      console.error("Error adding report:", error);
+      toast({
+        title: "Error submitting report",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
+    }
   };
 
-  const deleteReport = (id: string) => {
-    setReports(prev => prev.filter(report => report.id !== id));
+  const updateReport = async (id: string, updates: Partial<Report>) => {
+    try {
+      const updateData: any = {};
+      
+      if (updates.title !== undefined) updateData.title = updates.title;
+      if (updates.category !== undefined) updateData.category = updates.category;
+      if (updates.description !== undefined) updateData.description = updates.description;
+      if (updates.status !== undefined) updateData.status = updates.status;
+      if (updates.priority !== undefined) updateData.priority = updates.priority;
+      if (updates.coordinates !== undefined) {
+        updateData.lat = updates.coordinates.lat;
+        updateData.lng = updates.coordinates.lng;
+      }
+      if (updates.upvotes !== undefined) updateData.upvotes = updates.upvotes;
+      if (updates.imageUrl !== undefined) updateData.image_url = updates.imageUrl;
+
+      const { error } = await supabase
+        .from("reports")
+        .update(updateData)
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setReports((prev) =>
+        prev.map((report) =>
+          report.id === id ? { ...report, ...updates } : report
+        )
+      );
+    } catch (error: any) {
+      console.error("Error updating report:", error);
+      toast({
+        title: "Error updating report",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
+  const deleteReport = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("reports")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setReports((prev) => prev.filter((report) => report.id !== id));
+    } catch (error: any) {
+      console.error("Error deleting report:", error);
+      toast({
+        title: "Error deleting report",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
+    }
   };
 
   const getReportById = (id: string) => {
-    return reports.find(report => report.id === id);
+    return reports.find((report) => report.id === id);
   };
 
-  const upvoteReport = (id: string) => {
-    setReports(prev =>
-      prev.map(report =>
-        report.id === id ? { ...report, upvotes: report.upvotes + 1 } : report
-      )
-    );
+  const upvoteReport = async (id: string) => {
+    const report = getReportById(id);
+    if (!report) return;
+
+    try {
+      const newUpvotes = report.upvotes + 1;
+      await updateReport(id, { upvotes: newUpvotes });
+    } catch (error) {
+      console.error("Error upvoting report:", error);
+    }
   };
 
   const getTotalResolved = () => {
-    return reports.filter(r => r.status === "Resolved").length;
+    return reports.filter((r) => r.status === "Resolved").length;
   };
 
   return (
@@ -268,7 +207,8 @@ export const ReportProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         deleteReport,
         getReportById,
         upvoteReport,
-        getTotalResolved
+        getTotalResolved,
+        isLoading,
       }}
     >
       {children}

@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Plus, Home, FileText, TrendingUp } from "lucide-react";
+import { Plus, Home, FileText, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 import CitizenHome from "@/components/citizen/CitizenHome";
 import CitizenActivity from "@/components/citizen/CitizenActivity";
 import ReportFlow from "@/components/citizen/ReportFlow";
@@ -10,6 +11,7 @@ type CitizenTab = "home" | "activity" | "report";
 const Citizen = () => {
   const [activeTab, setActiveTab] = useState<CitizenTab>("home");
   const [showReportFlow, setShowReportFlow] = useState(false);
+  const { signOut } = useAuth();
 
   const renderContent = () => {
     if (showReportFlow) {
@@ -85,44 +87,56 @@ const Citizen = () => {
 
       {/* Desktop Sidebar */}
       {!showReportFlow && (
-        <nav className="fixed left-0 top-0 hidden h-screen w-64 border-r border-border bg-card p-6 md:block">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-primary">CityCare</h1>
-            <p className="text-sm text-muted-foreground">Citizen Portal</p>
-          </div>
+        <nav className="fixed left-0 top-0 hidden h-screen w-64 border-r border-border bg-card md:block">
+          <div className="flex h-full flex-col">
+            <div className="p-6 border-b border-border">
+              <h1 className="text-2xl font-bold text-primary">CityCare</h1>
+              <p className="text-sm text-muted-foreground">Citizen Portal</p>
+            </div>
 
-          <div className="space-y-2">
-            <button
-              onClick={() => setActiveTab("home")}
-              className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
-                activeTab === "home"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-foreground hover:bg-muted"
-              }`}
-            >
-              <Home className="h-5 w-5" />
-              <span className="font-medium">Home</span>
-            </button>
+            <div className="flex-1 p-6 space-y-2">
+              <button
+                onClick={() => setActiveTab("home")}
+                className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
+                  activeTab === "home"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground hover:bg-muted"
+                }`}
+              >
+                <Home className="h-5 w-5" />
+                <span className="font-medium">Home</span>
+              </button>
 
-            <button
-              onClick={() => setActiveTab("activity")}
-              className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
-                activeTab === "activity"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-foreground hover:bg-muted"
-              }`}
-            >
-              <FileText className="h-5 w-5" />
-              <span className="font-medium">My Activity</span>
-            </button>
+              <button
+                onClick={() => setActiveTab("activity")}
+                className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
+                  activeTab === "activity"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground hover:bg-muted"
+                }`}
+              >
+                <FileText className="h-5 w-5" />
+                <span className="font-medium">My Activity</span>
+              </button>
 
-            <button
-              onClick={() => setShowReportFlow(true)}
-              className="flex w-full items-center gap-3 rounded-lg bg-primary px-4 py-3 text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              <Plus className="h-5 w-5" />
-              <span className="font-medium">Report Issue</span>
-            </button>
+              <button
+                onClick={() => setShowReportFlow(true)}
+                className="flex w-full items-center gap-3 rounded-lg bg-primary px-4 py-3 text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                <Plus className="h-5 w-5" />
+                <span className="font-medium">Report Issue</span>
+              </button>
+            </div>
+
+            <div className="border-t border-border p-6">
+              <button
+                onClick={signOut}
+                className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-foreground transition-colors hover:bg-muted"
+              >
+                <LogOut className="h-5 w-5" />
+                <span className="font-medium">Logout</span>
+              </button>
+            </div>
           </div>
         </nav>
       )}
