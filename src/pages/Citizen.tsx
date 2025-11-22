@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Plus, Home, FileText } from "lucide-react";
+import { Plus, Home, FileText, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import CitizenHome from "@/components/citizen/CitizenHome";
 import CitizenActivity from "@/components/citizen/CitizenActivity";
 import ReportFlow from "@/components/citizen/ReportFlow";
@@ -11,6 +12,7 @@ type CitizenTab = "home" | "activity" | "report";
 const Citizen = () => {
   const [activeTab, setActiveTab] = useState<CitizenTab>("home");
   const [showReportFlow, setShowReportFlow] = useState(false);
+  const navigate = useNavigate();
 
   const renderContent = () => {
     if (showReportFlow) {
@@ -55,7 +57,15 @@ const Citizen = () => {
       {/* Bottom Navigation (Mobile) */}
       {!showReportFlow && (
         <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur-sm md:hidden">
-          <div className="grid grid-cols-3 gap-1 px-2 py-3">
+          <div className="grid grid-cols-4 gap-1 px-2 py-3">
+            <button
+              onClick={() => navigate("/")}
+              className="flex flex-col items-center gap-1 rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted"
+            >
+              <ArrowLeft className="h-5 w-5" />
+              <span className="text-xs font-medium">Back</span>
+            </button>
+
             <button
               onClick={() => setActiveTab("home")}
               className={`flex flex-col items-center gap-1 rounded-lg px-3 py-2 transition-colors ${
@@ -101,6 +111,16 @@ const Citizen = () => {
             </div>
 
             <div className="flex-1 p-6 space-y-2">
+              <button
+                onClick={() => navigate("/")}
+                className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-foreground transition-colors hover:bg-muted"
+              >
+                <ArrowLeft className="h-5 w-5" />
+                <span className="font-medium">Back to Home</span>
+              </button>
+
+              <div className="border-t border-border my-2" />
+
               <button
                 onClick={() => setActiveTab("home")}
                 className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
