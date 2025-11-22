@@ -18,8 +18,9 @@ interface ReportLocationStepProps {
 }
 
 const ReportLocationStep = ({ onConfirm, onBack }: ReportLocationStepProps) => {
-  const [position, setPosition] = useState({ lat: 40.758, lng: -73.9855 }); // NYC default
+  const [position, setPosition] = useState({ lat: 42.6026, lng: 20.9030 }); // Kosovo (Pristina) default
   const mapRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
 
   useEffect(() => {
     if (!mapRef.current) {
@@ -30,13 +31,26 @@ const ReportLocationStep = ({ onConfirm, onBack }: ReportLocationStepProps) => {
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
-      // Update position when map moves
-      map.on("moveend", () => {
-        const center = map.getCenter();
-        setPosition({ lat: center.lat, lng: center.lng });
+      // Create initial marker
+      const marker = L.marker([position.lat, position.lng], {
+        draggable: true,
+      }).addTo(map);
+
+      // Update position when marker is dragged
+      marker.on("dragend", () => {
+        const pos = marker.getLatLng();
+        setPosition({ lat: pos.lat, lng: pos.lng });
+      });
+
+      // Add click event to place marker
+      map.on("click", (e: L.LeafletMouseEvent) => {
+        const { lat, lng } = e.latlng;
+        setPosition({ lat, lng });
+        marker.setLatLng([lat, lng]);
       });
 
       mapRef.current = map;
+      markerRef.current = marker;
     }
 
     return () => {
@@ -44,6 +58,7 @@ const ReportLocationStep = ({ onConfirm, onBack }: ReportLocationStepProps) => {
         mapRef.current.remove();
         mapRef.current = null;
       }
+      markerRef.current = null;
     };
   }, []);
 
@@ -57,36 +72,13 @@ const ReportLocationStep = ({ onConfirm, onBack }: ReportLocationStepProps) => {
       {/* Instructions */}
       <div className="bg-primary/5 p-4 text-center">
         <p className="text-sm font-medium text-foreground">
-          Drag the map to position the center pin at the exact location
+          Click on the map to set the location or drag the pin to adjust
         </p>
       </div>
 
       {/* Map Container */}
       <div className="relative flex-1">
         <div id="report-location-map" className="h-full w-full" />
-
-
-        {/* Fixed Center Pin */}
-        <div className="pointer-events-none absolute left-1/2 top-1/2 z-[1000] -translate-x-1/2 -translate-y-full">
-          <motion.div
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
-            <svg
-              width="40"
-              height="50"
-              viewBox="0 0 40 50"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M20 0C8.95 0 0 8.95 0 20C0 35 20 50 20 50C20 50 40 35 40 20C40 8.95 31.05 0 20 0Z"
-                fill="hsl(var(--primary))"
-              />
-              <circle cx="20" cy="20" r="8" fill="white" />
-            </svg>
-          </motion.div>
-        </div>
 
         {/* Coordinates Display */}
         <div className="absolute bottom-4 left-4 z-[1000] rounded-lg bg-card/95 px-4 py-2 shadow-lg backdrop-blur-sm">
