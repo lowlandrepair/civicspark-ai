@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { useState } from "react";
+import { MapContainer, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import L from "leaflet";
@@ -18,9 +18,9 @@ interface MapEventsProps {
 }
 
 function MapEvents({ setPosition }: MapEventsProps) {
-  useMapEvents({
-    moveend: (e) => {
-      const center = e.target.getCenter();
+  const map = useMapEvents({
+    moveend: () => {
+      const center = map.getCenter();
       setPosition({ lat: center.lat, lng: center.lng });
     },
   });
@@ -34,7 +34,6 @@ interface ReportLocationStepProps {
 
 const ReportLocationStep = ({ onConfirm, onBack }: ReportLocationStepProps) => {
   const [position, setPosition] = useState({ lat: 40.7580, lng: -73.9855 }); // NYC default
-  const mapRef = useRef<any>(null);
 
   return (
     <motion.div
@@ -57,7 +56,6 @@ const ReportLocationStep = ({ onConfirm, onBack }: ReportLocationStepProps) => {
           zoom={13}
           className="h-full w-full"
           zoomControl={true}
-          ref={mapRef}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
