@@ -1,17 +1,16 @@
 import { useState } from "react";
-import { Plus, Home, FileText, LogOut } from "lucide-react";
+import { Plus, Home, FileText } from "lucide-react";
 import { motion } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
 import CitizenHome from "@/components/citizen/CitizenHome";
 import CitizenActivity from "@/components/citizen/CitizenActivity";
 import ReportFlow from "@/components/citizen/ReportFlow";
+import { ProfileDropdown } from "@/components/ProfileDropdown";
 
 type CitizenTab = "home" | "activity" | "report";
 
 const Citizen = () => {
   const [activeTab, setActiveTab] = useState<CitizenTab>("home");
   const [showReportFlow, setShowReportFlow] = useState(false);
-  const { signOut } = useAuth();
 
   const renderContent = () => {
     if (showReportFlow) {
@@ -30,6 +29,13 @@ const Citizen = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pb-20 md:pb-0">
+      {/* Profile Dropdown (Desktop) */}
+      {!showReportFlow && (
+        <div className="fixed top-4 right-4 z-50 hidden md:block">
+          <ProfileDropdown />
+        </div>
+      )}
+      
       {renderContent()}
 
       {/* Floating Action Button (Mobile) */}
@@ -129,13 +135,9 @@ const Citizen = () => {
             </div>
 
             <div className="border-t border-border p-6">
-              <button
-                onClick={signOut}
-                className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-foreground transition-colors hover:bg-muted"
-              >
-                <LogOut className="h-5 w-5" />
-                <span className="font-medium">Logout</span>
-              </button>
+              <div className="flex items-center justify-center">
+                <ProfileDropdown />
+              </div>
             </div>
           </div>
         </nav>
