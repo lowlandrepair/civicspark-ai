@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Plus, Home, FileText, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import CitizenHome from "@/components/citizen/CitizenHome";
 import CitizenActivity from "@/components/citizen/CitizenActivity";
 import ReportFlow from "@/components/citizen/ReportFlow";
@@ -13,6 +14,7 @@ const Citizen = () => {
   const [activeTab, setActiveTab] = useState<CitizenTab>("home");
   const [showReportFlow, setShowReportFlow] = useState(false);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const renderContent = () => {
     if (showReportFlow) {
@@ -57,7 +59,7 @@ const Citizen = () => {
                 className="flex flex-col items-center gap-1 rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted"
               >
                 <ArrowLeft className="h-5 w-5" />
-                <span className="text-xs font-medium">Back</span>
+                <span className="text-xs font-medium">{t("common.back")}</span>
               </button>
 
               <button
@@ -69,7 +71,7 @@ const Citizen = () => {
                 }`}
               >
                 <Home className="h-5 w-5" />
-                <span className="text-xs font-medium">Home</span>
+                <span className="text-xs font-medium">{t("citizen.home")}</span>
               </button>
 
               <button
@@ -81,7 +83,7 @@ const Citizen = () => {
                 }`}
               >
                 <FileText className="h-5 w-5" />
-                <span className="text-xs font-medium">Activity</span>
+                <span className="text-xs font-medium">{t("citizen.myActivity")}</span>
               </button>
 
               <button
@@ -89,7 +91,7 @@ const Citizen = () => {
                 className="flex flex-col items-center gap-1 rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted"
               >
                 <Plus className="h-5 w-5" />
-                <span className="text-xs font-medium">Report</span>
+                <span className="text-xs font-medium">{t("citizen.reportIssue")}</span>
               </button>
             </div>
             
@@ -106,8 +108,8 @@ const Citizen = () => {
         <nav className="fixed left-0 top-0 hidden h-screen w-64 border-r border-border bg-card md:block">
           <div className="flex h-full flex-col">
             <div className="p-6 border-b border-border">
-              <h1 className="text-2xl font-bold text-primary">CityCare</h1>
-              <p className="text-sm text-muted-foreground">Citizen Portal</p>
+              <h1 className="text-2xl font-bold text-primary">{t("citizen.title")}</h1>
+              <p className="text-sm text-muted-foreground">{t("citizen.subtitle")}</p>
             </div>
 
             <div className="flex-1 p-6 space-y-2">
@@ -116,7 +118,7 @@ const Citizen = () => {
                 className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-foreground transition-colors hover:bg-muted"
               >
                 <ArrowLeft className="h-5 w-5" />
-                <span className="font-medium">Back to Home</span>
+                <span className="font-medium">{t("common.backToHome")}</span>
               </button>
 
               <div className="border-t border-border my-2" />
@@ -130,7 +132,7 @@ const Citizen = () => {
                 }`}
               >
                 <Home className="h-5 w-5" />
-                <span className="font-medium">Home</span>
+                <span className="font-medium">{t("citizen.home")}</span>
               </button>
 
               <button
@@ -142,7 +144,7 @@ const Citizen = () => {
                 }`}
               >
                 <FileText className="h-5 w-5" />
-                <span className="font-medium">My Activity</span>
+                <span className="font-medium">{t("citizen.myActivity")}</span>
               </button>
 
               <button
@@ -150,7 +152,7 @@ const Citizen = () => {
                 className="flex w-full items-center gap-3 rounded-lg bg-primary px-4 py-3 text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 <Plus className="h-5 w-5" />
-                <span className="font-medium">Report Issue</span>
+                <span className="font-medium">{t("citizen.reportIssue")}</span>
               </button>
             </div>
 

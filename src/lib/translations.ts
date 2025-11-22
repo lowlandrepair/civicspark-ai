@@ -11,6 +11,9 @@ export const translations = {
       theme: "Theme",
       lightMode: "Light Mode",
       darkMode: "Dark Mode",
+      home: "Home",
+      back: "Back",
+      backToHome: "Back to Home",
     },
     profile: {
       title: "My Profile",
@@ -52,6 +55,7 @@ export const translations = {
       reportIssue: "Report Issue",
       myActivity: "My Activity",
       citizenPortalDescription: "Report issues, track progress, and help improve your community",
+      home: "Home",
     },
     admin: {
       title: "CityCare",
@@ -94,6 +98,9 @@ export const translations = {
       theme: "Tema",
       lightMode: "Mënyrë e Ndritshme",
       darkMode: "Mënyrë e Errët",
+      home: "Ballina",
+      back: "Kthehu",
+      backToHome: "Kthehu në Ballina",
     },
     profile: {
       title: "Profili Im",
@@ -135,6 +142,7 @@ export const translations = {
       reportIssue: "Raporto Problem",
       myActivity: "Aktiviteti Im",
       citizenPortalDescription: "Raportoni probleme, ndiqni përparimin dhe ndihmoni në përmirësimin e komunitetit tuaj",
+      home: "Ballina",
     },
     admin: {
       title: "CityCare",
@@ -177,6 +185,9 @@ export const translations = {
       theme: "Tema",
       lightMode: "Modo Claro",
       darkMode: "Modo Oscuro",
+      home: "Inicio",
+      back: "Volver",
+      backToHome: "Volver al Inicio",
     },
     profile: {
       title: "Mi Perfil",
@@ -218,6 +229,7 @@ export const translations = {
       reportIssue: "Reportar Problema",
       myActivity: "Mi Actividad",
       citizenPortalDescription: "Reporta problemas, rastrea el progreso y ayuda a mejorar tu comunidad",
+      home: "Inicio",
     },
     admin: {
       title: "CityCare",
@@ -260,6 +272,9 @@ export const translations = {
       theme: "Thème",
       lightMode: "Mode Clair",
       darkMode: "Mode Sombre",
+      home: "Accueil",
+      back: "Retour",
+      backToHome: "Retour à l'Accueil",
     },
     profile: {
       title: "Mon Profil",
@@ -301,6 +316,7 @@ export const translations = {
       reportIssue: "Signaler un Problème",
       myActivity: "Mon Activité",
       citizenPortalDescription: "Signalez des problèmes, suivez les progrès et aidez à améliorer votre communauté",
+      home: "Accueil",
     },
     admin: {
       title: "CityCare",
