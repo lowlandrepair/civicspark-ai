@@ -1,14 +1,23 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Users, Shield, TrendingUp, MapPin, ArrowRight, LogIn } from "lucide-react";
+import { Users, Shield, TrendingUp, MapPin, ArrowRight, LogIn, Globe, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useReports } from "@/contexts/ReportContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme } from "@/contexts/ThemeContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Index = () => {
   const navigate = useNavigate();
   const { getTotalResolved, reports } = useReports();
   const { user, isAdmin } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
+  const { isDarkMode, toggleDarkMode } = useTheme();
   const totalResolved = getTotalResolved();
 
   const handlePortalNavigation = (portal: "citizen" | "admin") => {
@@ -23,6 +32,50 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">
+      {/* Top Controls */}
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+        {/* Language Switcher */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" className="h-10 w-10">
+              <Globe className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-32">
+            <div className="p-2 space-y-1">
+              {[
+                { code: "en", label: "English" },
+                { code: "sq", label: "Shqip" },
+                { code: "es", label: "Español" },
+                { code: "fr", label: "Français" },
+              ].map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => setLanguage(lang.code as any)}
+                  className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
+                    language === lang.code
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-accent"
+                  }`}
+                >
+                  {lang.label}
+                </button>
+              ))}
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Dark Mode Toggle */}
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-10 w-10"
+          onClick={toggleDarkMode}
+        >
+          {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        </Button>
+      </div>
+
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Background Pattern */}
