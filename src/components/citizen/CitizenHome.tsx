@@ -12,7 +12,7 @@ interface ReportWithAuthor extends Report {
 }
 
 const CitizenHome = () => {
-  const { reports, getTotalResolved, upvoteReport } = useReports();
+  const { reports, getTotalResolved, upvoteReport, userUpvotedReports } = useReports();
   const { user } = useAuth();
   const [reportsWithAuthors, setReportsWithAuthors] = useState<ReportWithAuthor[]>([]);
   const totalResolved = getTotalResolved();
@@ -186,10 +186,19 @@ const CitizenHome = () => {
                   </div>
                   <div className="flex flex-col items-center gap-2">
                     <button
-                      onClick={() => upvoteReport(report.id)}
-                      className="flex flex-col items-center gap-1 rounded-lg px-3 py-2 transition-colors hover:bg-primary/10 active:scale-95"
+                      onClick={() => {
+                        if (!userUpvotedReports.has(report.id)) {
+                          upvoteReport(report.id);
+                        }
+                      }}
+                      disabled={userUpvotedReports.has(report.id)}
+                      className={`flex flex-col items-center gap-1 rounded-lg px-3 py-2 transition-colors ${
+                        userUpvotedReports.has(report.id)
+                          ? "cursor-not-allowed opacity-50"
+                          : "hover:bg-primary/10 active:scale-95"
+                      }`}
                     >
-                      <TrendingUp className="h-5 w-5 text-primary" />
+                      <TrendingUp className={`h-5 w-5 text-primary ${userUpvotedReports.has(report.id) ? "fill-primary" : ""}`} />
                       <span className="text-sm font-semibold text-primary">{report.upvotes}</span>
                     </button>
                   </div>
