@@ -6,13 +6,12 @@
 
 **Empowering communities to report, track, and resolve city issues in real-time**
 
-[![Built with Lovable](https://img.shields.io/badge/Built%20with-Lovable-ff69b4)](https://lovable.dev)
 [![React](https://img.shields.io/badge/React-18.3.1-blue)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-38bdf8)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Powered-3ECF8E)](https://supabase.com/)
 
-[🚀 Live Demo](https://lovable.dev/projects/b27ed2ef-700e-46a5-a79b-ef56551ff56d) | [📖 Documentation](#documentation) | [🎯 Features](#-key-features)
+[🚀 Live Demo] | [📖 Documentation](#documentation) | [🎯 Features](#-key-features)
 
 </div>
 
@@ -165,12 +164,12 @@ CityCare provides:
 | **Leaflet** | Interactive map rendering |
 | **React-Leaflet** | React bindings for Leaflet |
 | **Canvas Confetti** | Celebration animations |
+| **php** | CType safety and developer experience |
 
 ### Backend & Services
 | Technology | Purpose |
 |------------|---------|
 | **Supabase** | PostgreSQL database, auth, RLS |
-| **Lovable Cloud** | Managed Supabase integration |
 | **Edge Functions** | Serverless backend logic (ready) |
 
 ### State Management & Data
@@ -219,7 +218,6 @@ CityCare provides:
    VITE_SUPABASE_PROJECT_ID=your_project_id
    ```
 
-   > **Note**: If using Lovable Cloud, these variables are auto-configured.
 
 4. **Initialize the database**
    
@@ -683,12 +681,11 @@ export const MyComponent: React.FC<MyComponentProps> = ({ title, onAction }) => 
 
 ## 🚀 Deployment
 
-### Deploying to Lovable
+### Deployment
 
-1. **Open your project** on [Lovable](https://lovable.dev/projects/b27ed2ef-700e-46a5-a79b-ef56551ff56d)
-2. **Click "Publish"** button (top-right on desktop, bottom-right on mobile)
-3. **Frontend changes**: Click "Update" in publish dialog to go live
-4. **Backend changes**: Deploy automatically (migrations, edge functions)
+1. Build and deploy the frontend to your chosen hosting provider (for example, run `npm run build` and publish the `/dist` folder).
+2. Apply database migrations and server/edge function updates via Supabase or your backend deployment process.
+3. Set the required production environment variables in your hosting environment (see the Environment Variables section above).
 
 ### Custom Domain Setup
 
@@ -875,60 +872,16 @@ SOFTWARE.
 ## 🙏 Credits & Acknowledgments
 
 ### Team
-- **Project Lead**: [Your Name]
-- **Frontend Development**: [Developer Names]
-- **Backend Development**: [Developer Names]
-- **UI/UX Design**: [Designer Names]
+- **Project Lead**: [Dalmat ademi]
+- **Frontend Development**: [Dalmat ademi]
+- **Backend Development**: [Dalmat ademi]
+- **UI/UX Design**: [Dalmat ademi]
 
 ### Hackathon
-Built for **[Hackathon Name]** - [Date]
-
-### Third-Party Libraries
-- [React](https://reactjs.org/) - UI library
-- [Supabase](https://supabase.com/) - Backend as a Service
-- [Lovable](https://lovable.dev/) - AI-powered development platform
-- [shadcn/ui](https://ui.shadcn.com/) - Component library
-- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
-- [Leaflet](https://leafletjs.com/) - Mapping library
-- [OpenStreetMap](https://www.openstreetmap.org/) - Map tiles
+Built for **[digitalschool]** - [Date]
 
 ### Icons & Assets
 - [Lucide Icons](https://lucide.dev/) - Icon set
 - [Unsplash](https://unsplash.com/) - Placeholder images
 
----
-
-## 📞 Contact & Support
-
-### Project Links
-- **Website**: [citycare.lovable.app](https://citycare.lovable.app)
-- **GitHub**: [github.com/yourusername/citycare](https://github.com/yourusername/citycare)
-- **Documentation**: [docs.citycare.app](#)
-- **Lovable Project**: [lovable.dev/projects/b27ed2ef-700e-46a5-a79b-ef56551ff56d](https://lovable.dev/projects/b27ed2ef-700e-46a5-a79b-ef56551ff56d)
-
-### Get Help
-- **Bug Reports**: Open an issue on GitHub
-- **Feature Requests**: Start a discussion
-- **Email**: support@citycare.app
-- **Discord**: [Join our community](#)
-
-### Social Media
-- **Twitter**: [@CityCareApp](#)
-- **LinkedIn**: [CityCare](#)
-- **Facebook**: [CityCare Kosovo](#)
-
----
-
-<div align="center">
-
-**Built with ❤️ for smarter cities**
-
-⭐ **Star this repo** if you found it helpful!
-
-[🚀 Deploy Your Own](https://lovable.dev) | [📚 Read the Docs](#) | [💬 Join Community](#)
-
----
-
-*Last Updated: January 2025*
-
-</div>
+by dalmat ademi
