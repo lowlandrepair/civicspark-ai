@@ -31,13 +31,6 @@ const Citizen = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pb-20 md:pb-0">
-      {/* Profile Dropdown (Desktop) */}
-      {!showReportFlow && (
-        <div className="fixed top-4 right-4 z-50 hidden md:block">
-          <ProfileDropdown />
-        </div>
-      )}
-      
       {renderContent()}
 
       {/* Floating Action Button (Mobile) */}
@@ -57,46 +50,53 @@ const Citizen = () => {
       {/* Bottom Navigation (Mobile) */}
       {!showReportFlow && (
         <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur-sm md:hidden">
-          <div className="grid grid-cols-4 gap-1 px-2 py-3">
-            <button
-              onClick={() => navigate("/")}
-              className="flex flex-col items-center gap-1 rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted"
-            >
-              <ArrowLeft className="h-5 w-5" />
-              <span className="text-xs font-medium">Back</span>
-            </button>
+          <div className="flex items-center justify-between px-2 py-3">
+            <div className="flex gap-1 flex-1">
+              <button
+                onClick={() => navigate("/")}
+                className="flex flex-col items-center gap-1 rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted"
+              >
+                <ArrowLeft className="h-5 w-5" />
+                <span className="text-xs font-medium">Back</span>
+              </button>
 
-            <button
-              onClick={() => setActiveTab("home")}
-              className={`flex flex-col items-center gap-1 rounded-lg px-3 py-2 transition-colors ${
-                activeTab === "home"
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              <Home className="h-5 w-5" />
-              <span className="text-xs font-medium">Home</span>
-            </button>
+              <button
+                onClick={() => setActiveTab("home")}
+                className={`flex flex-col items-center gap-1 rounded-lg px-3 py-2 transition-colors ${
+                  activeTab === "home"
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                <Home className="h-5 w-5" />
+                <span className="text-xs font-medium">Home</span>
+              </button>
 
-            <button
-              onClick={() => setActiveTab("activity")}
-              className={`flex flex-col items-center gap-1 rounded-lg px-3 py-2 transition-colors ${
-                activeTab === "activity"
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              <FileText className="h-5 w-5" />
-              <span className="text-xs font-medium">Activity</span>
-            </button>
+              <button
+                onClick={() => setActiveTab("activity")}
+                className={`flex flex-col items-center gap-1 rounded-lg px-3 py-2 transition-colors ${
+                  activeTab === "activity"
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                <FileText className="h-5 w-5" />
+                <span className="text-xs font-medium">Activity</span>
+              </button>
 
-            <button
-              onClick={() => setShowReportFlow(true)}
-              className="flex flex-col items-center gap-1 rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted"
-            >
-              <Plus className="h-5 w-5" />
-              <span className="text-xs font-medium">Report</span>
-            </button>
+              <button
+                onClick={() => setShowReportFlow(true)}
+                className="flex flex-col items-center gap-1 rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted"
+              >
+                <Plus className="h-5 w-5" />
+                <span className="text-xs font-medium">Report</span>
+              </button>
+            </div>
+            
+            {/* Profile Dropdown for Mobile */}
+            <div className="flex-shrink-0 pl-2 border-l border-border">
+              <ProfileDropdown />
+            </div>
           </div>
         </nav>
       )}
