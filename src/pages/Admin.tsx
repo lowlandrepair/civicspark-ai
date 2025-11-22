@@ -1,15 +1,17 @@
 import { useState } from "react";
-import { LayoutDashboard, Map, ListTodo, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Map, ListTodo, BarChart3, Home } from "lucide-react";
 import AdminOverview from "@/components/admin/AdminOverview";
 import AdminMap from "@/components/admin/AdminMap";
 import AdminKanban from "@/components/admin/AdminKanban";
 import AdminAnalytics from "@/components/admin/AdminAnalytics";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
+import { useNavigate } from "react-router-dom";
 
 type AdminTab = "overview" | "map" | "kanban" | "analytics";
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
+  const navigate = useNavigate();
 
   const renderContent = () => {
     switch (activeTab) {
@@ -44,6 +46,16 @@ const Admin = () => {
 
           {/* Navigation */}
           <nav className="flex-1 space-y-1 p-4">
+            <button
+              onClick={() => navigate("/")}
+              className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sidebar-foreground transition-colors hover:bg-sidebar-accent"
+            >
+              <Home className="h-5 w-5" />
+              <span className="font-medium">Home</span>
+            </button>
+
+            <div className="border-t border-sidebar-border my-2" />
+
             <button
               onClick={() => setActiveTab("overview")}
               className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
