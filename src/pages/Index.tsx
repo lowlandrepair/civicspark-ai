@@ -111,21 +111,21 @@ const Index = () => {
                     className="gap-2"
                   >
                     <LogIn className="h-4 w-4" />
-                    Sign In
+                    {t("landing.signIn")}
                   </Button>
                 </motion.div>
               )}
             </div>
 
             <h1 className="mb-6 text-5xl font-bold leading-tight md:text-7xl">
-              Smart City, <br />
+              {t("landing.smartCity")} <br />
               <span className="bg-gradient-hero bg-clip-text text-transparent">
-                Smarter Solutions
+                {t("landing.smarterSolutions")}
               </span>
             </h1>
 
             <p className="mb-12 text-xl text-muted-foreground md:text-2xl">
-              AI-powered platform connecting citizens with city services
+              {t("landing.aiPowered")}
             </p>
 
             {/* Community Impact */}
@@ -137,8 +137,8 @@ const Index = () => {
             >
               <TrendingUp className="h-6 w-6 text-success" />
               <div className="text-left">
-                <p className="text-sm text-muted-foreground">Community Impact</p>
-                <p className="text-2xl font-bold text-success">{totalResolved} Issues Resolved</p>
+                <p className="text-sm text-muted-foreground">{t("landing.communityImpact")}</p>
+                <p className="text-2xl font-bold text-success">{totalResolved} {t("landing.issuesResolved")}</p>
               </div>
             </motion.div>
 
@@ -156,9 +156,9 @@ const Index = () => {
                   <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-4">
                     <Users className="h-8 w-8 text-primary" />
                   </div>
-                  <h2 className="mb-3 text-2xl font-bold">Citizen Portal</h2>
+                  <h2 className="mb-3 text-2xl font-bold">{t("citizen.subtitle")}</h2>
                   <p className="mb-6 text-muted-foreground">
-                    Report issues, track progress, and help improve your community
+                    {t("citizen.citizenPortalDescription")}
                   </p>
                   <ul className="mb-6 space-y-2 text-left text-sm text-muted-foreground">
                     <li className="flex items-center gap-2">
@@ -179,7 +179,7 @@ const Index = () => {
                     className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                     size="lg"
                   >
-                    {user ? "Enter Citizen Portal" : "Sign In to Report"}
+                    {user ? t("landing.openCitizen") : t("landing.signIn")}
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </Button>
                 </div>
@@ -197,7 +197,7 @@ const Index = () => {
                   <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-4">
                     <Shield className="h-8 w-8 text-primary" />
                   </div>
-                  <h2 className="mb-3 text-2xl font-bold">Admin Command Center</h2>
+                  <h2 className="mb-3 text-2xl font-bold">{t("admin.subtitle")}</h2>
                   <p className="mb-6 text-muted-foreground">
                     Tactical dashboard for city management and workflow optimization
                   </p>
@@ -221,7 +221,7 @@ const Index = () => {
                     className="w-full"
                     size="lg"
                   >
-                    {user && isAdmin ? "Enter Command Center" : user ? "Citizen Access Only" : "Sign In Required"}
+                    {user && isAdmin ? t("landing.openAdmin") : user ? "Citizen Access Only" : t("landing.signIn")}
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </Button>
                 </div>
