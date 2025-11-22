@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { LayoutDashboard, Map, ListTodo, BarChart3, Home } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import AdminOverview from "@/components/admin/AdminOverview";
 import AdminMap from "@/components/admin/AdminMap";
 import AdminKanban from "@/components/admin/AdminKanban";
 import AdminAnalytics from "@/components/admin/AdminAnalytics";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
-import { useNavigate } from "react-router-dom";
 
 type AdminTab = "overview" | "map" | "kanban" | "analytics";
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const renderContent = () => {
     switch (activeTab) {
@@ -35,8 +37,8 @@ const Admin = () => {
         <div className="flex h-full flex-col">
           {/* Header */}
           <div className="border-b border-sidebar-border p-6">
-            <h1 className="text-2xl font-bold text-sidebar-primary">CityCare</h1>
-            <p className="text-sm text-sidebar-foreground/70">Command Center</p>
+            <h1 className="text-2xl font-bold text-sidebar-primary">{t("admin.title")}</h1>
+            <p className="text-sm text-sidebar-foreground/70">{t("admin.subtitle")}</p>
           </div>
 
           {/* Navigation */}
@@ -46,7 +48,7 @@ const Admin = () => {
               className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sidebar-foreground transition-colors hover:bg-sidebar-accent"
             >
               <Home className="h-5 w-5" />
-              <span className="font-medium">Home</span>
+              <span className="font-medium">{t("common.home")}</span>
             </button>
 
             <div className="border-t border-sidebar-border my-2" />
@@ -60,7 +62,7 @@ const Admin = () => {
               }`}
             >
               <LayoutDashboard className="h-5 w-5" />
-              <span className="font-medium">Overview</span>
+              <span className="font-medium">{t("admin.overview")}</span>
             </button>
 
             <button
@@ -72,7 +74,7 @@ const Admin = () => {
               }`}
             >
               <Map className="h-5 w-5" />
-              <span className="font-medium">Live Map</span>
+              <span className="font-medium">{t("admin.liveMap")}</span>
             </button>
 
             <button
@@ -84,7 +86,7 @@ const Admin = () => {
               }`}
             >
               <ListTodo className="h-5 w-5" />
-              <span className="font-medium">Kanban Board</span>
+              <span className="font-medium">{t("admin.kanbanBoard")}</span>
             </button>
 
             <button
@@ -96,7 +98,7 @@ const Admin = () => {
               }`}
             >
               <BarChart3 className="h-5 w-5" />
-              <span className="font-medium">Analytics</span>
+              <span className="font-medium">{t("admin.analytics")}</span>
             </button>
           </nav>
 
