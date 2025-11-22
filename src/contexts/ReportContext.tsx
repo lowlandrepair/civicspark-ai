@@ -13,6 +13,7 @@ interface ReportContextType {
   upvoteReport: (id: string) => Promise<void>;
   getTotalResolved: () => number;
   isLoading: boolean;
+  userUpvotedReports: Set<string>;
 }
 
 const ReportContext = createContext<ReportContextType | undefined>(undefined);
@@ -20,12 +21,22 @@ const ReportContext = createContext<ReportContextType | undefined>(undefined);
 export const ReportProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [reports, setReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [userUpvotedReports, setUserUpvotedReports] = useState<Set<string>>(new Set());
   const { user } = useAuth();
 
   // Fetch reports from Supabase
   useEffect(() => {
     fetchReports();
   }, []);
+
+  // Fetch user's upvoted reports
+  useEffect(() => {
+    if (user) {
+      fetchUserUpvotes();
+    } else {
+      setUserUpvotedReports(new Set());
+    }
+  }, [user]);
 
   const fetchReports = async () => {
     try {
@@ -60,6 +71,24 @@ export const ReportProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchUserUpvotes = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("report_upvotes")
+        .select("report_id")
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      const upvotedIds = new Set(data?.map((item) => item.report_id) || []);
+      setUserUpvotedReports(upvotedIds);
+    } catch (error: any) {
+      console.error("Error fetching user upvotes:", error);
     }
   };
 
@@ -208,11 +237,21 @@ export const ReportProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             : report
         )
       );
+
+      // Add to user's upvoted reports
+      setUserUpvotedReports((prev) => new Set([...prev, id]));
+
+      toast({
+        title: "Success",
+        description: "Report upvoted!",
+      });
     } catch (error: any) {
       console.error("Error upvoting report:", error);
       toast({
         title: "Error",
-        description: "Failed to upvote report",
+        description: error.message.includes("already upvoted") 
+          ? "You have already upvoted this report" 
+          : "Failed to upvote report",
         variant: "destructive",
       });
     }
@@ -233,6 +272,7 @@ export const ReportProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         upvoteReport,
         getTotalResolved,
         isLoading,
+        userUpvotedReports,
       }}
     >
       {children}
