@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapContainer, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer } from "react-leaflet";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import L from "leaflet";
@@ -12,20 +12,6 @@ L.Icon.Default.mergeOptions({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
-
-interface MapEventsProps {
-  setPosition: (pos: { lat: number; lng: number }) => void;
-}
-
-function MapEvents({ setPosition }: MapEventsProps) {
-  const map = useMapEvents({
-    moveend: () => {
-      const center = map.getCenter();
-      setPosition({ lat: center.lat, lng: center.lng });
-    },
-  });
-  return null;
-}
 
 interface ReportLocationStepProps {
   onConfirm: (coords: { lat: number; lng: number }) => void;
@@ -56,12 +42,21 @@ const ReportLocationStep = ({ onConfirm, onBack }: ReportLocationStepProps) => {
           zoom={13}
           className="h-full w-full"
           zoomControl={true}
+          whenReady={((event: any) => {
+            const mapInstance = event.target;
+            const center = mapInstance.getCenter();
+            setPosition({ lat: center.lat, lng: center.lng });
+
+            mapInstance.on("moveend", () => {
+              const c = mapInstance.getCenter();
+              setPosition({ lat: c.lat, lng: c.lng });
+            });
+          }) as any}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <MapEvents setPosition={setPosition} />
         </MapContainer>
 
         {/* Fixed Center Pin */}
