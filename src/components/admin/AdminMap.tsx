@@ -36,7 +36,7 @@ const AdminMap = () => {
   useEffect(() => {
     // Initialize map
     if (!mapRef.current) {
-      const map = L.map('admin-map-view').setView([40.7580, -73.9855], 12);
+      const map = L.map('admin-map-view').setView([42.6026, 20.9030], 12); // Kosovo (Pristina)
       
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
