@@ -1,8 +1,8 @@
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { useReports } from "@/contexts/ReportContext";
 import { AlertCircle, Clock, CheckCircle2, TrendingUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import L from "leaflet";
+import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 
 // Fix Leaflet default marker icon
@@ -15,6 +15,7 @@ L.Icon.Default.mergeOptions({
 
 const AdminOverview = () => {
   const { reports } = useReports();
+  const mapRef = useRef<L.Map | null>(null);
   
   const activeReports = reports.filter(r => r.status !== "Resolved" && r.status !== "Rejected");
   const pendingCount = reports.filter(r => r.status === "Pending").length;
@@ -31,6 +32,48 @@ const AdminOverview = () => {
       iconAnchor: [12, 12],
     });
   };
+
+  useEffect(() => {
+    // Initialize map when component mounts
+    if (!mapRef.current) {
+      const map = L.map('admin-overview-map').setView([40.7580, -73.9855], 12);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      mapRef.current = map;
+    }
+
+    // Add markers for active reports
+    const markers: L.Marker[] = [];
+    activeReports.forEach((report) => {
+      const marker = L.marker(
+        [report.coordinates.lat, report.coordinates.lng],
+        { icon: getMarkerIcon(report.priority) }
+      );
+      
+      marker.bindPopup(`
+        <div style="min-width: 200px;">
+          <h4 style="font-weight: 600; margin-bottom: 8px;">${report.title}</h4>
+          <div style="font-size: 14px; line-height: 1.5;">
+            <p><strong>Category:</strong> ${report.category}</p>
+            <p><strong>Priority:</strong> ${report.priority}</p>
+            <p><strong>Status:</strong> ${report.status}</p>
+            <p style="font-size: 12px; color: #666; margin-top: 4px;">${report.description}</p>
+          </div>
+        </div>
+      `);
+      
+      marker.addTo(mapRef.current!);
+      markers.push(marker);
+    });
+
+    // Cleanup markers when reports change
+    return () => {
+      markers.forEach(m => m.remove());
+    };
+  }, [activeReports]);
 
   return (
     <div className="h-screen overflow-hidden">
@@ -114,35 +157,7 @@ const AdminOverview = () => {
 
         {/* Map */}
         <Card className="flex-1 overflow-hidden">
-          <MapContainer
-            center={[40.7580, -73.9855]}
-            zoom={12}
-            className="h-full w-full"
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {activeReports.map((report) => (
-              <Marker
-                key={report.id}
-                position={[report.coordinates.lat, report.coordinates.lng]}
-                icon={getMarkerIcon(report.priority)}
-              >
-                <Popup>
-                  <div className="min-w-[200px]">
-                    <h4 className="mb-2 font-semibold">{report.title}</h4>
-                    <div className="space-y-1 text-sm">
-                      <p><span className="font-medium">Category:</span> {report.category}</p>
-                      <p><span className="font-medium">Priority:</span> {report.priority}</p>
-                      <p><span className="font-medium">Status:</span> {report.status}</p>
-                      <p className="text-xs text-muted-foreground">{report.description}</p>
-                    </div>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
+          <div id="admin-overview-map" className="h-full w-full" />
         </Card>
       </div>
     </div>

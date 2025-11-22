@@ -1,8 +1,8 @@
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { useReports } from "@/contexts/ReportContext";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import L from "leaflet";
+import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 
 // Fix Leaflet default marker icon
@@ -15,6 +15,7 @@ L.Icon.Default.mergeOptions({
 
 const AdminMap = () => {
   const { reports, updateReport } = useReports();
+  const mapRef = useRef<L.Map | null>(null);
   const activeReports = reports.filter(r => r.status !== "Resolved");
 
   const getMarkerIcon = (priority: string, status: string) => {
@@ -31,6 +32,73 @@ const AdminMap = () => {
       iconAnchor: [15, 15],
     });
   };
+
+  useEffect(() => {
+    // Initialize map
+    if (!mapRef.current) {
+      const map = L.map('admin-map-view').setView([40.7580, -73.9855], 12);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      mapRef.current = map;
+    }
+
+    // Add markers
+    const markers: L.Marker[] = [];
+    reports.forEach((report) => {
+      const marker = L.marker(
+        [report.coordinates.lat, report.coordinates.lng],
+        { icon: getMarkerIcon(report.priority, report.status) }
+      );
+      
+      const priorityClass = report.priority === "High" ? "destructive" : report.priority === "Medium" ? "warning" : "primary";
+      const statusClass = report.status === "Resolved" ? "success" : report.status === "In Progress" ? "warning" : "muted";
+      
+      marker.bindPopup(`
+        <div style="min-width: 300px; padding: 8px;">
+          <div style="margin-bottom: 12px;">
+            <h4 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">${report.title}</h4>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
+              <span style="background: ${report.priority === "High" ? "#fef2f2" : report.priority === "Medium" ? "#fffbeb" : "#eff6ff"}; 
+                           color: ${report.priority === "High" ? "#dc2626" : report.priority === "Medium" ? "#d97706" : "#2563eb"};
+                           padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500;">
+                ${report.priority}
+              </span>
+              <span style="background: #f3f4f6; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500;">
+                ${report.category}
+              </span>
+              <span style="background: ${report.status === "Resolved" ? "#f0fdf4" : report.status === "In Progress" ? "#fffbeb" : "#f3f4f6"};
+                           color: ${report.status === "Resolved" ? "#16a34a" : report.status === "In Progress" ? "#d97706" : "#6b7280"};
+                           padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500;">
+                ${report.status}
+              </span>
+            </div>
+          </div>
+          <p style="font-size: 14px; color: #6b7280; margin-bottom: 12px;">${report.description}</p>
+          ${report.imageUrl ? `<img src="${report.imageUrl}" style="width: 100%; height: 128px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;" />` : ''}
+          <div style="display: flex; gap: 8px;">
+            ${report.status === "Pending" ? `<button onclick="window.updateReportStatus('${report.id}', 'In Progress')" style="flex: 1; padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">Start Work</button>` : ''}
+            ${report.status === "In Progress" ? `<button onclick="window.updateReportStatus('${report.id}', 'Resolved')" style="flex: 1; padding: 8px 16px; background: #22c55e; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">Mark Resolved</button>` : ''}
+          </div>
+        </div>
+      `);
+      
+      marker.addTo(mapRef.current!);
+      markers.push(marker);
+    });
+
+    // Setup global function for popup buttons
+    (window as any).updateReportStatus = (id: string, status: string) => {
+      updateReport(id, { status: status as any });
+    };
+
+    return () => {
+      markers.forEach(m => m.remove());
+      delete (window as any).updateReportStatus;
+    };
+  }, [reports, updateReport]);
 
   return (
     <div className="h-screen">
@@ -65,84 +133,7 @@ const AdminMap = () => {
 
       {/* Map */}
       <div className="h-[calc(100vh-113px)]">
-        <MapContainer
-          center={[40.7580, -73.9855]}
-          zoom={12}
-          className="h-full w-full"
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          {reports.map((report) => (
-            <Marker
-              key={report.id}
-              position={[report.coordinates.lat, report.coordinates.lng]}
-              icon={getMarkerIcon(report.priority, report.status)}
-            >
-              <Popup className="custom-popup" minWidth={300}>
-                <div className="space-y-3">
-                  <div>
-                    <h4 className="mb-1 text-lg font-semibold">{report.title}</h4>
-                    <div className="flex flex-wrap gap-2">
-                      <span className={`rounded-full px-2 py-1 text-xs font-medium ${
-                        report.priority === "High" ? "bg-destructive/10 text-destructive" :
-                        report.priority === "Medium" ? "bg-warning/10 text-warning" :
-                        "bg-primary/10 text-primary"
-                      }`}>
-                        {report.priority}
-                      </span>
-                      <span className="rounded-full bg-muted px-2 py-1 text-xs font-medium">
-                        {report.category}
-                      </span>
-                      <span className={`rounded-full px-2 py-1 text-xs font-medium ${
-                        report.status === "Resolved" ? "bg-success/10 text-success" :
-                        report.status === "In Progress" ? "bg-warning/10 text-warning" :
-                        "bg-muted text-muted-foreground"
-                      }`}>
-                        {report.status}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <p className="text-sm text-muted-foreground">{report.description}</p>
-                  
-                  {report.imageUrl && (
-                    <img
-                      src={report.imageUrl}
-                      alt="Report"
-                      className="h-32 w-full rounded-lg object-cover"
-                    />
-                  )}
-                  
-                  <div className="flex gap-2">
-                    {report.status === "Pending" && (
-                      <Button
-                        size="sm"
-                        onClick={() => updateReport(report.id, { status: "In Progress" })}
-                        className="flex-1"
-                      >
-                        Start Work
-                      </Button>
-                    )}
-                    {report.status === "In Progress" && (
-                      <Button
-                        size="sm"
-                        onClick={() => updateReport(report.id, { status: "Resolved" })}
-                        className="flex-1 bg-success hover:bg-success/90"
-                      >
-                        Mark Resolved
-                      </Button>
-                    )}
-                    <Button size="sm" variant="outline">
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+        <div id="admin-map-view" className="h-full w-full" />
       </div>
     </div>
   );
