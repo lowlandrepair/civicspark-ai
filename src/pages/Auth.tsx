@@ -9,15 +9,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { motion } from "framer-motion";
-import { LogIn, UserPlus } from "lucide-react";
+import { LogIn, UserPlus, MapPin } from "lucide-react";
 
-const authSchema = z.object({
+const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }).max(255),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }).max(100),
 });
 
+const signupSchema = loginSchema.extend({
+  name: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100),
+});
+
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -36,9 +41,8 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      const validatedData = authSchema.parse({ email, password });
-
       if (isLogin) {
+        const validatedData = loginSchema.parse({ email, password });
         const { error } = await supabase.auth.signInWithPassword({
           email: validatedData.email,
           password: validatedData.password,
@@ -65,7 +69,9 @@ const Auth = () => {
           });
         }
       } else {
-        const { error } = await supabase.auth.signUp({
+        const validatedData = signupSchema.parse({ name, email, password });
+        
+        const { data: authData, error } = await supabase.auth.signUp({
           email: validatedData.email,
           password: validatedData.password,
           options: {
@@ -87,15 +93,18 @@ const Auth = () => {
               variant: "destructive",
             });
           }
-        } else {
-          // Insert default user role
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            await supabase.from("user_roles").insert({
-              user_id: user.id,
+        } else if (authData.user) {
+          // Insert default user role and profile
+          await Promise.all([
+            supabase.from("user_roles").insert({
+              user_id: authData.user.id,
               role: "user",
-            });
-          }
+            }),
+            supabase.from("profiles").insert({
+              user_id: authData.user.id,
+              display_name: validatedData.name,
+            })
+          ]);
 
           toast({
             title: "Account created!",
@@ -128,16 +137,37 @@ const Auth = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
       >
-        <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-3xl font-bold">CityCare</CardTitle>
-            <CardDescription>
+        <Card className="border-2 shadow-xl">
+          <CardHeader className="space-y-3 text-center pb-6">
+            <div className="mx-auto flex items-center justify-center gap-2 mb-2">
+              <div className="p-2 bg-primary/10 rounded-full">
+                <MapPin className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle className="text-3xl font-bold text-primary">CityCare</CardTitle>
+            </div>
+            <CardDescription className="text-base">
               {isLogin ? "Sign in to your account" : "Create a new account"}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <form onSubmit={handleSubmit} className="space-y-4">
+              {!isLogin && (
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="John Doe"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="h-11"
+                  />
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -148,6 +178,7 @@ const Auth = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={isLoading}
+                  className="h-11"
                 />
               </div>
               <div className="space-y-2">
@@ -160,33 +191,44 @@ const Auth = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={isLoading}
+                  className="h-11"
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={isLoading}>
                 {isLoading ? (
-                  "Loading..."
+                  <span className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                    Loading...
+                  </span>
                 ) : isLogin ? (
                   <>
-                    <LogIn className="mr-2 h-4 w-4" />
+                    <LogIn className="mr-2 h-5 w-5" />
                     Sign In
                   </>
                 ) : (
                   <>
-                    <UserPlus className="mr-2 h-4 w-4" />
+                    <UserPlus className="mr-2 h-5 w-5" />
                     Sign Up
                   </>
                 )}
               </Button>
             </form>
-            <div className="mt-4 text-center text-sm">
-              {isLogin ? "Don't have an account?" : "Already have an account?"}
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                {isLogin ? "Don't have an account?" : "Already have an account?"}
+              </p>
               <Button
                 variant="link"
-                className="ml-1 p-0"
-                onClick={() => setIsLogin(!isLogin)}
+                className="mt-1 font-semibold text-base p-0 h-auto"
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setName("");
+                  setEmail("");
+                  setPassword("");
+                }}
                 disabled={isLoading}
               >
-                {isLogin ? "Sign up" : "Sign in"}
+                {isLogin ? "Create an account" : "Sign in instead"}
               </Button>
             </div>
           </CardContent>

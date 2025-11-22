@@ -1,18 +1,17 @@
 import { useState } from "react";
-import { LayoutDashboard, Map, ListTodo, BarChart3, Moon, Sun, LogOut } from "lucide-react";
+import { LayoutDashboard, Map, ListTodo, BarChart3, Moon, Sun } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useAuth } from "@/contexts/AuthContext";
 import AdminOverview from "@/components/admin/AdminOverview";
 import AdminMap from "@/components/admin/AdminMap";
 import AdminKanban from "@/components/admin/AdminKanban";
 import AdminAnalytics from "@/components/admin/AdminAnalytics";
+import { ProfileDropdown } from "@/components/ProfileDropdown";
 
 type AdminTab = "overview" | "map" | "kanban" | "analytics";
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
   const { isDarkMode, toggleDarkMode } = useTheme();
-  const { signOut } = useAuth();
 
   const renderContent = () => {
     switch (activeTab) {
@@ -31,6 +30,11 @@ const Admin = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
+      {/* Profile Dropdown */}
+      <div className="fixed top-4 right-4 z-50">
+        <ProfileDropdown />
+      </div>
+      
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-sidebar">
         <div className="flex h-full flex-col">
@@ -91,8 +95,8 @@ const Admin = () => {
             </button>
           </nav>
 
-          {/* Dark Mode Toggle & Logout */}
-          <div className="border-t border-sidebar-border p-4 space-y-1">
+          {/* Dark Mode Toggle */}
+          <div className="border-t border-sidebar-border p-4">
             <button
               onClick={toggleDarkMode}
               className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sidebar-foreground transition-colors hover:bg-sidebar-accent"
@@ -101,13 +105,6 @@ const Admin = () => {
               <span className="font-medium">
                 {isDarkMode ? "Light Mode" : "Dark Mode"}
               </span>
-            </button>
-            <button
-              onClick={signOut}
-              className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sidebar-foreground transition-colors hover:bg-sidebar-accent"
-            >
-              <LogOut className="h-5 w-5" />
-              <span className="font-medium">Logout</span>
             </button>
           </div>
         </div>
