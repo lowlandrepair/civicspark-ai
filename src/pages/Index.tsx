@@ -1,7 +1,12 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Users, Shield, TrendingUp, MapPin, ArrowRight, LogIn, Globe, Sun, Moon } from "lucide-react";
+import { 
+  Users, Shield, TrendingUp, MapPin, ArrowRight, LogIn, Globe, Sun, Moon,
+  Zap, Clock, CheckCircle, BarChart3, Bell, Camera, MessageSquare, Award
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useReports } from "@/contexts/ReportContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -32,7 +37,14 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "2s" }} />
+      </div>
+
       {/* Top Controls */}
       <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
         {/* Profile Dropdown - shown when logged in */}
@@ -130,9 +142,34 @@ const Index = () => {
               </span>
             </h1>
 
-            <p className="mb-12 text-xl text-muted-foreground md:text-2xl">
+            <p className="mb-8 text-xl text-muted-foreground md:text-2xl max-w-3xl mx-auto">
               {t("landing.aiPowered")}
             </p>
+
+            {/* Feature Badges */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mb-12 flex flex-wrap justify-center gap-3"
+            >
+              <Badge variant="secondary" className="px-4 py-2 text-sm">
+                <Zap className="mr-2 h-4 w-4" />
+                AI-Powered
+              </Badge>
+              <Badge variant="secondary" className="px-4 py-2 text-sm">
+                <MapPin className="mr-2 h-4 w-4" />
+                GPS Tracking
+              </Badge>
+              <Badge variant="secondary" className="px-4 py-2 text-sm">
+                <Bell className="mr-2 h-4 w-4" />
+                Real-time Updates
+              </Badge>
+              <Badge variant="secondary" className="px-4 py-2 text-sm">
+                <Camera className="mr-2 h-4 w-4" />
+                Photo Upload
+              </Badge>
+            </motion.div>
 
             {/* Community Impact */}
             <motion.div
@@ -276,8 +313,8 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="px-6 py-20 bg-gradient-to-br from-primary/5 to-background">
+      {/* How It Works Section */}
+      <section className="px-6 py-20 relative">
         <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -285,86 +322,237 @@ const Index = () => {
             transition={{ delay: 1.0 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold mb-4">Why Choose CityCare?</h2>
+            <h2 className="text-4xl font-bold mb-4">How It Works</h2>
             <p className="text-xl text-muted-foreground">
-              Modern technology meets community engagement
+              Report issues in just 3 simple steps
             </p>
           </motion.div>
 
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="grid gap-8 md:grid-cols-3 relative">
+            {/* Connecting Line */}
+            <div className="hidden md:block absolute top-24 left-[16.66%] right-[16.66%] h-0.5 bg-gradient-to-r from-primary via-primary to-primary" />
+            
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.1 }}
-              className="rounded-xl border border-border bg-card p-6 text-center"
+              className="relative"
             >
-              <div className="mb-4 inline-flex rounded-full bg-primary/10 p-4">
-                <MapPin className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Location-Based Reporting</h3>
-              <p className="text-muted-foreground">
-                Pin-point exact locations on an interactive map for accurate issue reporting
-              </p>
+              <Card className="p-8 text-center h-full border-2 hover:border-primary transition-colors">
+                <div className="mb-6 relative">
+                  <div className="inline-flex rounded-full bg-primary text-primary-foreground p-6 shadow-lg">
+                    <MapPin className="h-10 w-10" />
+                  </div>
+                  <Badge className="absolute -top-2 -right-2 h-8 w-8 rounded-full p-0 flex items-center justify-center text-lg">
+                    1
+                  </Badge>
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Select Location</h3>
+                <p className="text-muted-foreground">
+                  Click on the interactive map to pinpoint the exact location of the issue
+                </p>
+              </Card>
             </motion.div>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.2 }}
-              className="rounded-xl border border-border bg-card p-6 text-center"
+              className="relative"
             >
-              <div className="mb-4 inline-flex rounded-full bg-primary/10 p-4">
-                <Shield className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Secure & Verified</h3>
-              <p className="text-muted-foreground">
-                Your data is protected with enterprise-grade security and authentication
-              </p>
+              <Card className="p-8 text-center h-full border-2 hover:border-primary transition-colors">
+                <div className="mb-6 relative">
+                  <div className="inline-flex rounded-full bg-primary text-primary-foreground p-6 shadow-lg">
+                    <MessageSquare className="h-10 w-10" />
+                  </div>
+                  <Badge className="absolute -top-2 -right-2 h-8 w-8 rounded-full p-0 flex items-center justify-center text-lg">
+                    2
+                  </Badge>
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Describe Issue</h3>
+                <p className="text-muted-foreground">
+                  Add details, photos, and let AI enhance your description for clarity
+                </p>
+              </Card>
             </motion.div>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.3 }}
-              className="rounded-xl border border-border bg-card p-6 text-center"
+              className="relative"
             >
-              <div className="mb-4 inline-flex rounded-full bg-primary/10 p-4">
-                <TrendingUp className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Real-Time Updates</h3>
-              <p className="text-muted-foreground">
-                Track your reports from submission to resolution with live status updates
-              </p>
+              <Card className="p-8 text-center h-full border-2 hover:border-primary transition-colors">
+                <div className="mb-6 relative">
+                  <div className="inline-flex rounded-full bg-primary text-primary-foreground p-6 shadow-lg">
+                    <CheckCircle className="h-10 w-10" />
+                  </div>
+                  <Badge className="absolute -top-2 -right-2 h-8 w-8 rounded-full p-0 flex items-center justify-center text-lg">
+                    3
+                  </Badge>
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Track Progress</h3>
+                <p className="text-muted-foreground">
+                  Monitor your report status from submission to resolution in real-time
+                </p>
+              </Card>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="border-t border-border px-6 py-20">
-        <div className="mx-auto max-w-4xl text-center">
+      {/* Features Section */}
+      <section className="px-6 py-20 bg-gradient-to-br from-primary/5 to-background">
+        <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.4 }}
+            className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold mb-6">
-              Ready to Make a Difference?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Join thousands of citizens working together to build a better community
+            <h2 className="text-4xl font-bold mb-4">Powerful Features</h2>
+            <p className="text-xl text-muted-foreground">
+              Everything you need for effective civic engagement
             </p>
-            <Button
-              onClick={() => !user ? navigate("/auth") : navigate("/citizen")}
-              size="lg"
-              className="text-lg px-8 py-6"
-            >
-              {user ? "Go to Portal" : "Get Started Today"}
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+          </motion.div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {[
+              { icon: MapPin, title: "Interactive Maps", desc: "Click-to-report with GPS precision" },
+              { icon: Zap, title: "AI Enhancement", desc: "Auto-improve report descriptions" },
+              { icon: Bell, title: "Smart Notifications", desc: "Stay updated on report progress" },
+              { icon: BarChart3, title: "Analytics Dashboard", desc: "Track city-wide issue trends" },
+              { icon: Shield, title: "Secure Platform", desc: "Enterprise-grade security" },
+              { icon: Award, title: "Community Impact", desc: "Gamified engagement scores" }
+            ].map((feature, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.5 + idx * 0.1 }}
+              >
+                <Card className="p-6 h-full hover:shadow-lg transition-shadow border-2 hover:border-primary/50">
+                  <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-3">
+                    <feature.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground">{feature.desc}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Impact Section */}
+      <section className="px-6 py-20 relative">
+        <div className="mx-auto max-w-6xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.0 }}
+            className="text-center"
+          >
+            <Card className="p-12 bg-gradient-to-br from-primary/10 to-primary/5 border-2">
+              <Award className="h-16 w-16 text-primary mx-auto mb-6" />
+              <h2 className="text-4xl font-bold mb-4">Making Real Impact</h2>
+              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Join a growing community of engaged citizens working together to improve their neighborhoods
+              </p>
+              <div className="grid gap-8 md:grid-cols-3 mt-12">
+                <div>
+                  <p className="text-5xl font-bold text-primary mb-2">{reports.length}+</p>
+                  <p className="text-muted-foreground">Issues Reported</p>
+                </div>
+                <div>
+                  <p className="text-5xl font-bold text-warning mb-2">
+                    {Math.round((totalResolved / (reports.length || 1)) * 100)}%
+                  </p>
+                  <p className="text-muted-foreground">Resolution Rate</p>
+                </div>
+                <div>
+                  <p className="text-5xl font-bold text-success mb-2">&lt; 48h</p>
+                  <p className="text-muted-foreground">Avg Response Time</p>
+                </div>
+              </div>
+            </Card>
           </motion.div>
         </div>
       </section>
+
+      {/* CTA Section */}
+      <section className="border-t border-border px-6 py-20 relative">
+        <div className="mx-auto max-w-4xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.2 }}
+            className="relative"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 blur-3xl" />
+            <div className="relative bg-card/50 backdrop-blur-sm rounded-2xl p-12 border-2 border-primary/20">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                Ready to Make a Difference?
+              </h2>
+              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Join thousands of citizens working together to build a better, more responsive community
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Button
+                  onClick={() => !user ? navigate("/auth") : navigate("/citizen")}
+                  size="lg"
+                  className="text-lg px-8 py-6 group"
+                >
+                  {user ? "Go to Portal" : "Get Started Today"}
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </Button>
+                {!user && (
+                  <Button
+                    onClick={() => navigate("/auth")}
+                    size="lg"
+                    variant="outline"
+                    className="text-lg px-8 py-6"
+                  >
+                    Learn More
+                  </Button>
+                )}
+              </div>
+              
+              {/* Trust Indicators */}
+              <div className="mt-12 flex flex-wrap justify-center gap-8 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-success" />
+                  <span>Free to Use</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-primary" />
+                  <span>Secure & Private</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-warning" />
+                  <span>24/7 Available</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-border px-6 py-12 bg-card/30">
+        <div className="mx-auto max-w-6xl text-center">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <MapPin className="h-6 w-6 text-primary" />
+            <span className="text-2xl font-bold">CityCare</span>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Empowering communities through technology
+          </p>
+          <p className="text-xs text-muted-foreground">
+            © 2024 CityCare. Built with ❤️ for better cities.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };
