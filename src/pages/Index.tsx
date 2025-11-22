@@ -1,13 +1,25 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Users, Shield, TrendingUp, MapPin, ArrowRight } from "lucide-react";
+import { Users, Shield, TrendingUp, MapPin, ArrowRight, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useReports } from "@/contexts/ReportContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const navigate = useNavigate();
   const { getTotalResolved, reports } = useReports();
+  const { user, isAdmin } = useAuth();
   const totalResolved = getTotalResolved();
+
+  const handlePortalNavigation = (portal: "citizen" | "admin") => {
+    if (!user) {
+      navigate("/auth");
+    } else if (portal === "admin" && !isAdmin) {
+      navigate("/citizen");
+    } else {
+      navigate(`/${portal}`);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">
@@ -22,16 +34,35 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mx-auto max-w-6xl text-center"
           >
-            {/* Logo */}
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="mb-8 inline-flex items-center gap-3 rounded-full bg-primary/10 px-6 py-3"
-            >
-              <MapPin className="h-6 w-6 text-primary" />
-              <span className="text-2xl font-bold text-primary">CityCare</span>
-            </motion.div>
+            {/* Logo and Auth Button */}
+            <div className="mb-8 flex items-center justify-center gap-4">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2 }}
+                className="inline-flex items-center gap-3 rounded-full bg-primary/10 px-6 py-3"
+              >
+                <MapPin className="h-6 w-6 text-primary" />
+                <span className="text-2xl font-bold text-primary">CityCare</span>
+              </motion.div>
+              
+              {!user && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <Button
+                    onClick={() => navigate("/auth")}
+                    variant="outline"
+                    className="gap-2"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    Sign In
+                  </Button>
+                </motion.div>
+              )}
+            </div>
 
             <h1 className="mb-6 text-5xl font-bold leading-tight md:text-7xl">
               Smart City, <br />
@@ -91,11 +122,11 @@ const Index = () => {
                     </li>
                   </ul>
                   <Button
-                    onClick={() => navigate("/citizen")}
+                    onClick={() => handlePortalNavigation("citizen")}
                     className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                     size="lg"
                   >
-                    Enter Citizen Portal
+                    {user ? "Enter Citizen Portal" : "Sign In to Report"}
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </Button>
                 </div>
@@ -132,12 +163,12 @@ const Index = () => {
                     </li>
                   </ul>
                   <Button
-                    onClick={() => navigate("/admin")}
+                    onClick={() => handlePortalNavigation("admin")}
                     variant="outline"
                     className="w-full"
                     size="lg"
                   >
-                    Enter Command Center
+                    {user && isAdmin ? "Enter Command Center" : user ? "Citizen Access Only" : "Sign In Required"}
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </Button>
                 </div>
