@@ -1,12 +1,44 @@
 import { motion } from "framer-motion";
-import { TrendingUp, MapPin, Clock, CheckCircle2 } from "lucide-react";
+import { TrendingUp, MapPin, Clock, CheckCircle2, User } from "lucide-react";
 import { useReports } from "@/contexts/ReportContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Report } from "@/types/report";
+
+interface ReportWithAuthor extends Report {
+  authorName?: string;
+}
 
 const CitizenHome = () => {
   const { reports, getTotalResolved } = useReports();
-  const recentReports = reports.slice(0, 5);
+  const { user } = useAuth();
+  const [reportsWithAuthors, setReportsWithAuthors] = useState<ReportWithAuthor[]>([]);
   const totalResolved = getTotalResolved();
+
+  useEffect(() => {
+    const fetchAuthors = async () => {
+      const recentReports = reports.slice(0, 5);
+      const userIds = [...new Set(recentReports.map(r => r.userId))];
+      
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, display_name")
+        .in("user_id", userIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.user_id, p.display_name]) || []);
+      
+      const reportsWithNames = recentReports.map(report => ({
+        ...report,
+        authorName: profileMap.get(report.userId) || "Anonymous User"
+      }));
+      
+      setReportsWithAuthors(reportsWithNames);
+    };
+
+    fetchAuthors();
+  }, [reports]);
 
   return (
     <div className="min-h-screen md:ml-64">
@@ -103,7 +135,7 @@ const CitizenHome = () => {
         <div className="mx-auto max-w-6xl">
           <h2 className="mb-6 text-2xl font-bold">Recent Community Reports</h2>
           <div className="space-y-4">
-            {recentReports.map((report, index) => (
+            {reportsWithAuthors.map((report, index) => (
               <motion.div
                 key={report.id}
                 initial={{ opacity: 0, x: -20 }}
@@ -111,8 +143,15 @@ const CitizenHome = () => {
                 transition={{ delay: index * 0.1 }}
                 className="rounded-xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md"
               >
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div className="flex-1">
+                    <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+                      <User className="h-4 w-4" />
+                      <span className="font-medium">{report.authorName}</span>
+                      <span>•</span>
+                      <Clock className="h-4 w-4" />
+                      <span>{format(new Date(report.timestamp), "MMM d, yyyy 'at' h:mm a")}</span>
+                    </div>
                     <div className="mb-2 flex flex-wrap items-center gap-2">
                       <span className={`rounded-full px-3 py-1 text-xs font-medium ${
                         report.priority === "High"
@@ -121,7 +160,7 @@ const CitizenHome = () => {
                           ? "bg-warning/10 text-warning"
                           : "bg-muted text-muted-foreground"
                       }`}>
-                        {report.priority}
+                        {report.priority} Priority
                       </span>
                       <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                         {report.category}
@@ -137,16 +176,17 @@ const CitizenHome = () => {
                       </span>
                     </div>
                     <h3 className="mb-2 text-lg font-semibold">{report.title}</h3>
-                    <p className="mb-2 text-sm text-muted-foreground line-clamp-2">
+                    <p className="mb-3 text-sm text-muted-foreground line-clamp-2">
                       {report.description}
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      {format(new Date(report.timestamp), "MMM d, yyyy 'at' h:mm a")}
-                    </p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <MapPin className="h-3 w-3" />
+                      <span>Location: {report.coordinates.lat.toFixed(4)}, {report.coordinates.lng.toFixed(4)}</span>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-primary" />
-                    <span className="font-semibold text-primary">{report.upvotes}</span>
+                    <span className="font-semibold text-primary">{report.upvotes} upvotes</span>
                   </div>
                 </div>
               </motion.div>
