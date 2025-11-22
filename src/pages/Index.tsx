@@ -143,7 +143,7 @@ const Index = () => {
             </motion.div>
 
             {/* Portal Selection */}
-            <div className="grid gap-8 md:grid-cols-2">
+            <div className={`grid gap-8 ${user && isAdmin ? 'md:grid-cols-2' : 'md:grid-cols-1 max-w-xl mx-auto'}`}>
               {/* Citizen Portal */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -185,47 +185,49 @@ const Index = () => {
                 </div>
               </motion.div>
 
-              {/* Admin Portal */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.6 }}
-                className="group relative overflow-hidden rounded-2xl border-2 border-border bg-card p-8 transition-all hover:border-primary hover:shadow-xl"
-              >
-                <div className="absolute right-0 top-0 h-32 w-32 translate-x-8 -translate-y-8 rounded-full bg-primary/10 blur-3xl" />
-                <div className="relative">
-                  <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-4">
-                    <Shield className="h-8 w-8 text-primary" />
+              {/* Admin Portal - Only visible to admins */}
+              {user && isAdmin && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="group relative overflow-hidden rounded-2xl border-2 border-border bg-card p-8 transition-all hover:border-primary hover:shadow-xl"
+                >
+                  <div className="absolute right-0 top-0 h-32 w-32 translate-x-8 -translate-y-8 rounded-full bg-primary/10 blur-3xl" />
+                  <div className="relative">
+                    <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-4">
+                      <Shield className="h-8 w-8 text-primary" />
+                    </div>
+                    <h2 className="mb-3 text-2xl font-bold">{t("admin.subtitle")}</h2>
+                    <p className="mb-6 text-muted-foreground">
+                      Tactical dashboard for city management and workflow optimization
+                    </p>
+                    <ul className="mb-6 space-y-2 text-left text-sm text-muted-foreground">
+                      <li className="flex items-center gap-2">
+                        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                        Live map with priority pins
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                        Kanban workflow board
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                        Analytics & insights
+                      </li>
+                    </ul>
+                    <Button
+                      onClick={() => handlePortalNavigation("admin")}
+                      variant="outline"
+                      className="w-full"
+                      size="lg"
+                    >
+                      {t("landing.openAdmin")}
+                      <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                    </Button>
                   </div>
-                  <h2 className="mb-3 text-2xl font-bold">{t("admin.subtitle")}</h2>
-                  <p className="mb-6 text-muted-foreground">
-                    Tactical dashboard for city management and workflow optimization
-                  </p>
-                  <ul className="mb-6 space-y-2 text-left text-sm text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                      Live map with priority pins
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                      Kanban workflow board
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                      Analytics & insights
-                    </li>
-                  </ul>
-                  <Button
-                    onClick={() => handlePortalNavigation("admin")}
-                    variant="outline"
-                    className="w-full"
-                    size="lg"
-                  >
-                    {user && isAdmin ? t("landing.openAdmin") : user ? "Citizen Access Only" : t("landing.signIn")}
-                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                </div>
-              </motion.div>
+                </motion.div>
+              )}
             </div>
           </motion.div>
         </div>
@@ -265,6 +267,96 @@ const Index = () => {
               <p className="text-muted-foreground">Resolved Issues</p>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="px-6 py-20 bg-gradient-to-br from-primary/5 to-background">
+        <div className="mx-auto max-w-6xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl font-bold mb-4">Why Choose CityCare?</h2>
+            <p className="text-xl text-muted-foreground">
+              Modern technology meets community engagement
+            </p>
+          </motion.div>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.1 }}
+              className="rounded-xl border border-border bg-card p-6 text-center"
+            >
+              <div className="mb-4 inline-flex rounded-full bg-primary/10 p-4">
+                <MapPin className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Location-Based Reporting</h3>
+              <p className="text-muted-foreground">
+                Pin-point exact locations on an interactive map for accurate issue reporting
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2 }}
+              className="rounded-xl border border-border bg-card p-6 text-center"
+            >
+              <div className="mb-4 inline-flex rounded-full bg-primary/10 p-4">
+                <Shield className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Secure & Verified</h3>
+              <p className="text-muted-foreground">
+                Your data is protected with enterprise-grade security and authentication
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.3 }}
+              className="rounded-xl border border-border bg-card p-6 text-center"
+            >
+              <div className="mb-4 inline-flex rounded-full bg-primary/10 p-4">
+                <TrendingUp className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Real-Time Updates</h3>
+              <p className="text-muted-foreground">
+                Track your reports from submission to resolution with live status updates
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="border-t border-border px-6 py-20">
+        <div className="mx-auto max-w-4xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.4 }}
+          >
+            <h2 className="text-4xl font-bold mb-6">
+              Ready to Make a Difference?
+            </h2>
+            <p className="text-xl text-muted-foreground mb-8">
+              Join thousands of citizens working together to build a better community
+            </p>
+            <Button
+              onClick={() => !user ? navigate("/auth") : navigate("/citizen")}
+              size="lg"
+              className="text-lg px-8 py-6"
+            >
+              {user ? "Go to Portal" : "Get Started Today"}
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </motion.div>
         </div>
       </section>
     </div>
