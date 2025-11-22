@@ -12,7 +12,7 @@ interface ReportWithAuthor extends Report {
 }
 
 const CitizenHome = () => {
-  const { reports, getTotalResolved } = useReports();
+  const { reports, getTotalResolved, upvoteReport } = useReports();
   const { user } = useAuth();
   const [reportsWithAuthors, setReportsWithAuthors] = useState<ReportWithAuthor[]>([]);
   const totalResolved = getTotalResolved();
@@ -184,9 +184,14 @@ const CitizenHome = () => {
                       <span>Location: {report.coordinates.lat.toFixed(4)}, {report.coordinates.lng.toFixed(4)}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-primary" />
-                    <span className="font-semibold text-primary">{report.upvotes} upvotes</span>
+                  <div className="flex flex-col items-center gap-2">
+                    <button
+                      onClick={() => upvoteReport(report.id)}
+                      className="flex flex-col items-center gap-1 rounded-lg px-3 py-2 transition-colors hover:bg-primary/10 active:scale-95"
+                    >
+                      <TrendingUp className="h-5 w-5 text-primary" />
+                      <span className="text-sm font-semibold text-primary">{report.upvotes}</span>
+                    </button>
                   </div>
                 </div>
               </motion.div>

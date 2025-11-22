@@ -119,6 +119,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      upvote_report: { Args: { report_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"

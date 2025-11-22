@@ -183,14 +183,38 @@ export const ReportProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   };
 
   const upvoteReport = async (id: string) => {
-    const report = getReportById(id);
-    if (!report) return;
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to upvote reports",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
-      const newUpvotes = report.upvotes + 1;
-      await updateReport(id, { upvotes: newUpvotes });
-    } catch (error) {
+      // Call the secure database function
+      const { error } = await supabase.rpc("upvote_report", {
+        report_id: id,
+      });
+
+      if (error) throw error;
+
+      // Update local state
+      setReports((prev) =>
+        prev.map((report) =>
+          report.id === id
+            ? { ...report, upvotes: report.upvotes + 1 }
+            : report
+        )
+      );
+    } catch (error: any) {
       console.error("Error upvoting report:", error);
+      toast({
+        title: "Error",
+        description: "Failed to upvote report",
+        variant: "destructive",
+      });
     }
   };
 

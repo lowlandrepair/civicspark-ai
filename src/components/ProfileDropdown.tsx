@@ -23,53 +23,28 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const ProfileDropdown = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, profile, updateProfile } = useAuth();
   const { reports } = useReports();
   const { language, setLanguage, t } = useLanguage();
   const { isDarkMode, toggleDarkMode } = useTheme();
   const { toast } = useToast();
-  const [displayName, setDisplayName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showMyReports, setShowMyReports] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      fetchProfile();
+    if (profile?.display_name) {
+      setEditValue(profile.display_name);
     }
-  }, [user]);
-
-  const fetchProfile = async () => {
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("display_name")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Error fetching profile:", error);
-    } else if (data) {
-      setDisplayName(data.display_name);
-      setEditValue(data.display_name);
-    }
-  };
+  }, [profile]);
 
   const handleUpdateName = async () => {
     if (!user || !editValue.trim()) return;
     
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ display_name: editValue.trim() })
-        .eq("user_id", user.id);
-
-      if (error) throw error;
-
-      setDisplayName(editValue.trim());
+      await updateProfile(editValue.trim());
       setIsEditing(false);
       toast({
         title: "Profile updated",
@@ -87,6 +62,7 @@ export const ProfileDropdown = () => {
   };
 
   const myReports = reports.filter((r) => r.userId === user?.id);
+  const displayName = profile?.display_name || "User";
   const initials = displayName
     .split(" ")
     .map((n) => n[0])
