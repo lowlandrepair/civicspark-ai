@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { MapContainer, TileLayer } from "react-leaflet";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import L from "leaflet";
@@ -19,7 +18,34 @@ interface ReportLocationStepProps {
 }
 
 const ReportLocationStep = ({ onConfirm, onBack }: ReportLocationStepProps) => {
-  const [position, setPosition] = useState({ lat: 40.7580, lng: -73.9855 }); // NYC default
+  const [position, setPosition] = useState({ lat: 40.758, lng: -73.9855 }); // NYC default
+  const mapRef = useRef<L.Map | null>(null);
+
+  useEffect(() => {
+    if (!mapRef.current) {
+      const map = L.map("report-location-map").setView([position.lat, position.lng], 13);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      // Update position when map moves
+      map.on("moveend", () => {
+        const center = map.getCenter();
+        setPosition({ lat: center.lat, lng: center.lng });
+      });
+
+      mapRef.current = map;
+    }
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <motion.div
@@ -37,27 +63,8 @@ const ReportLocationStep = ({ onConfirm, onBack }: ReportLocationStepProps) => {
 
       {/* Map Container */}
       <div className="relative flex-1">
-        <MapContainer
-          center={[position.lat, position.lng]}
-          zoom={13}
-          className="h-full w-full"
-          zoomControl={true}
-          whenReady={((event: any) => {
-            const mapInstance = event.target;
-            const center = mapInstance.getCenter();
-            setPosition({ lat: center.lat, lng: center.lng });
+        <div id="report-location-map" className="h-full w-full" />
 
-            mapInstance.on("moveend", () => {
-              const c = mapInstance.getCenter();
-              setPosition({ lat: c.lat, lng: c.lng });
-            });
-          }) as any}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-        </MapContainer>
 
         {/* Fixed Center Pin */}
         <div className="pointer-events-none absolute left-1/2 top-1/2 z-[1000] -translate-x-1/2 -translate-y-full">
