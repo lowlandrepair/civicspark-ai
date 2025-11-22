@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +28,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { user, isAdmin } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -148,18 +150,18 @@ const Auth = () => {
               <CardTitle className="text-3xl font-bold text-primary">CityCare</CardTitle>
             </div>
             <CardDescription className="text-base">
-              {isLogin ? "Sign in to your account" : "Create a new account"}
+              {isLogin ? t("auth.welcomeBack") : t("auth.createAccount")}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="name">{t("auth.name")}</Label>
                   <Input
                     id="name"
                     type="text"
-                    placeholder="John Doe"
+                    placeholder={t("auth.name")}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
@@ -169,11 +171,11 @@ const Auth = () => {
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("auth.email")}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={t("auth.email")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -182,7 +184,7 @@ const Auth = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("auth.password")}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -203,19 +205,19 @@ const Auth = () => {
                 ) : isLogin ? (
                   <>
                     <LogIn className="mr-2 h-5 w-5" />
-                    Sign In
+                    {t("auth.signIn")}
                   </>
                 ) : (
                   <>
                     <UserPlus className="mr-2 h-5 w-5" />
-                    Sign Up
+                    {t("auth.signUp")}
                   </>
                 )}
               </Button>
             </form>
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                {isLogin ? "Don't have an account?" : "Already have an account?"}
+                {isLogin ? t("auth.noAccount") : t("auth.haveAccount")}
               </p>
               <Button
                 variant="link"
@@ -228,7 +230,7 @@ const Auth = () => {
                 }}
                 disabled={isLoading}
               >
-                {isLogin ? "Create an account" : "Sign in instead"}
+                {isLogin ? t("auth.signUp") : t("auth.signIn")}
               </Button>
             </div>
           </CardContent>
