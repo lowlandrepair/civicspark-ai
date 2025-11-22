@@ -6,6 +6,7 @@ import { useReports } from "@/contexts/ReportContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { ProfileDropdown } from "@/components/ProfileDropdown";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,6 +35,11 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">
       {/* Top Controls */}
       <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+        {/* Profile Dropdown - shown when logged in */}
+        {user && (
+          <ProfileDropdown />
+        )}
+        
         {/* Language Switcher */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
