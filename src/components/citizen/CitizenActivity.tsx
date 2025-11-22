@@ -1,10 +1,42 @@
 import { motion } from "framer-motion";
-import { CheckCircle2, Clock, XCircle, AlertCircle } from "lucide-react";
+import { CheckCircle2, Clock, XCircle, AlertCircle, User, MapPin } from "lucide-react";
 import { useReports } from "@/contexts/ReportContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Report } from "@/types/report";
+
+interface ReportWithAuthor extends Report {
+  authorName?: string;
+}
 
 const CitizenActivity = () => {
   const { reports } = useReports();
+  const { user } = useAuth();
+  const [reportsWithAuthors, setReportsWithAuthors] = useState<ReportWithAuthor[]>([]);
+
+  useEffect(() => {
+    const fetchAuthors = async () => {
+      const userIds = [...new Set(reports.map(r => r.userId))];
+      
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, display_name")
+        .in("user_id", userIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.user_id, p.display_name]) || []);
+      
+      const reportsWithNames = reports.map(report => ({
+        ...report,
+        authorName: profileMap.get(report.userId) || "Anonymous User"
+      }));
+      
+      setReportsWithAuthors(reportsWithNames);
+    };
+
+    fetchAuthors();
+  }, [reports]);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -43,7 +75,7 @@ const CitizenActivity = () => {
         </motion.div>
 
         <div className="space-y-6">
-          {reports.map((report, index) => {
+          {reportsWithAuthors.map((report, index) => {
             const steps = getStatusSteps(report.status);
             return (
               <motion.div
@@ -54,16 +86,24 @@ const CitizenActivity = () => {
                 className="rounded-xl border border-border bg-card p-6 shadow-sm"
               >
                 {/* Report Header */}
-                <div className="mb-4 flex items-start justify-between">
+                <div className="mb-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <User className="h-4 w-4" />
+                      <span className="font-medium">{report.authorName}</span>
+                      <span>•</span>
+                      <span>{format(new Date(report.timestamp), "MMM d, yyyy 'at' h:mm a")}</span>
+                    </div>
+                  </div>
                   <div className="flex-1">
                     <div className="mb-2 flex items-center gap-2">
                       {getStatusIcon(report.status)}
                       <h3 className="text-lg font-semibold">{report.title}</h3>
                     </div>
-                    <p className="mb-2 text-sm text-muted-foreground">
+                    <p className="mb-3 text-sm text-muted-foreground">
                       {report.description}
                     </p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="mb-2 flex flex-wrap gap-2">
                       <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                         {report.category}
                       </span>
@@ -74,13 +114,14 @@ const CitizenActivity = () => {
                           ? "bg-warning/10 text-warning"
                           : "bg-muted text-muted-foreground"
                       }`}>
-                        {report.priority}
+                        {report.priority} Priority
                       </span>
                     </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <MapPin className="h-3 w-3" />
+                      <span>Location: {report.coordinates.lat.toFixed(4)}, {report.coordinates.lng.toFixed(4)}</span>
+                    </div>
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    {format(new Date(report.timestamp), "MMM d")}
-                  </span>
                 </div>
 
                 {/* Status Stepper */}
