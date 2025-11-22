@@ -30,11 +30,6 @@ const Admin = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
-      {/* Profile Dropdown */}
-      <div className="fixed top-4 right-4 z-50">
-        <ProfileDropdown />
-      </div>
-      
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-sidebar">
         <div className="flex h-full flex-col">
@@ -104,6 +99,11 @@ const Admin = () => {
               <span className="font-medium">Analytics</span>
             </button>
           </nav>
+
+          {/* Profile Dropdown at bottom of sidebar */}
+          <div className="border-t border-sidebar-border p-4">
+            <ProfileDropdown />
+          </div>
         </div>
       </aside>
 
